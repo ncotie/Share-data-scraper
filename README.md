@@ -10,5 +10,6 @@
 
 ## Entorno
 
+geckodriver !!
 
 ## DOI de Zenodo de un dataset generado
