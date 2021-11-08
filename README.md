@@ -22,7 +22,6 @@ El código ha sido escrito siguiendo los principios de programación orientada a o
 * doc/Class diagram.dia: diagrama UML del diseño del código
 * doc/PRA1_ncotie.pdf: documento más detallado sobre la práctica 
 * Logfiles/SMI_scraped_data.csv:  muestra de datos CSV
-* Logfiles/SMI_scraped_data.json: muestra de datos JSON
 
 
 
