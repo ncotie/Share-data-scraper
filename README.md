@@ -17,7 +17,6 @@ El código ha sido escrito siguiendo los principios de programación orientada a o
 * Classes/StockIndex.py: implementa la clase *StockIndex*, representando un índice bursátil.
 * Classes/Stock.py: implementa la clase *Stock*, representando una acción en particular, miembro/componente de un índice bursátil.
 * Classes/CSV.py: implementa la clase *CSV*, representando un fichero guardando datos de las acciones componentes del índice, en formato *CSV*.
-* Classes/JSON.py: parecido a CSV.py pero en formato *JSON*.
 ## Otros Ficheros
 * doc/Class diagram.dia: diagrama UML del diseño del código
 * doc/PRA1_ncotie.pdf: documento más detallado sobre la práctica 
