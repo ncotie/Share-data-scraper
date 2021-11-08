@@ -83,7 +83,7 @@ class StockIndex:
                 # using dictionary comprehension.
                 component_dict = {component_list_tags[x].text: component_list_tags[x].get_attribute('href')
                                   for x in range(len(component_list_tags))}
-            except Exception as e:
+            except Exception:
                 return "Problem parsing Index Component tags"
             print("The {} index has {} components.".format(self.index_name, len(component_dict)))
             # should be 20 for SMI
@@ -102,7 +102,6 @@ class StockIndex:
 
         # Instantiate Webdriver
         driver = webdriver.Firefox(options=options)
-        # driver.implicitly_wait(10)   # Remove if not needed
 
         # Inside a try - finally, execute all scraping then finally close Webdriver
         try:
@@ -117,10 +116,8 @@ class StockIndex:
             # and request each, in turn, to use the Webdriver to scrape their data.
             # Their data remains in their own Stock object, and they remain active.
 
-            #stocks_list = []  # List of Stock object references
             for component, url in component_stocks.items():
                 # Create Stock and store object reference
-                #stocks_list.append(Stock(component, url))
                 time.sleep(10)
                 stock = Stock(component, url)
                 self.component_stock_objects[component] = stock
@@ -130,17 +127,6 @@ class StockIndex:
                                                                        scraped_date,
                                                                        len(self.component_stock_objects),
                                                                        len(self.component_stocks)))
-
-            # now repeat the loop, asking each stock object to scrape its data
-            #for i in range(len(self.component_stock_objects)):  # in stocks_list:
-                # This should function sequentially, waiting 10 seconds between each scrape
-                #time.sleep(10)
-                # Note that driver remains open
-                #
-                #stock = self.component_stock_objects[i]
-                #stock_scrape_result = stock.scrape_data(driver, open_market_ok)
-                # print to say which stock has been scraped, and count of total
-                #print("Data scraped for {}, {}/{}".format(stock.get_name(), i+1, len(self.component_stock_objects)))
 
                 if stock_scrape_result != 0:   # if result is not ok, break the loop with return
                     return stock_scrape_result, scraped_date, component

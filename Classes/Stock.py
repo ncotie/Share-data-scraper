@@ -1,11 +1,7 @@
-from selenium import webdriver
-from selenium.webdriver.firefox.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support import expected_conditions as ec
 import time
-import datetime
+
 
 class Stock:
     """
@@ -50,7 +46,9 @@ class Stock:
 
         def collect_data_pair_tags(data_pair_list_tags):
             """
-
+            Nested function to assemble the stock data keys and values from the appropriate tags
+            and pack into four dictionaries.
+            Their types and names are preset by the structure of the web page as currently designed by SIX.
             :param data_pair_list_tags:
             :return:
             """
@@ -69,77 +67,77 @@ class Stock:
             # -------- End of nested function ---------- #
 
         # Open stock's own page
-        driver.get(self.url)
-        # Confirm title includes stock name
-        assert self.name in driver.title
-            ###  Need to handle what happens if wrong
+        try:
+            driver.get(self.url)
+            # Confirm title includes stock name
+            assert self.name in driver.title
+        except Exception:
+            return "Error opening stock webpage or invalid URL",\
+                   ""   # An empty value for scraped_date field
 
         # Driver was already on market web page, so no cookies need to be accepted at this point.
         # Grab the displayed Date in the security-header-datetime.
         # This will need to be attached to the data and later stored in the output files.
 
         time.sleep(10)  # to allow for loading time
-        date_string_full = driver.find_element(By.CLASS_NAME, "security-header-datetime")\
-            .find_element(By.TAG_NAME, "dd").text
-        # Note, the date value is only being taken as a string, same as displayed on the web page
-        # and truncated to remove the time, in the case of the market being open still.
-        # Dates could be later managed via data pre-processing if necessary.
-        self.scraped_date = date_string_full[:10]    # truncate any time value
+        try:
+            date_string_full = driver.find_element(By.CLASS_NAME, "security-header-datetime")\
+                .find_element(By.TAG_NAME, "dd").text
+            # Note, the date value is only being taken as a string, same as displayed on the web page
+            # and truncated to remove the time, in the case of the market being open still.
+            # Dates could be later managed via data pre-processing if necessary.
+            self.scraped_date = date_string_full[:10]    # truncate any time value
 
-        if len(date_string_full) > 10:    # If time was also displayed
-            # in the case of the SIX pages, time displayed means the market is still open,
-            # and data are not finalized for the day.
-            if not open_market_ok:
-                result = 1    # meaning market is open still
-                return result, self.scraped_date
+            if len(date_string_full) > 10:    # If time was also displayed
+                # in the case of the SIX pages, time displayed means the market is still open,
+                # and data are not finalized for the day.
+                if not open_market_ok:
+                    return "Market is open while user specified not allowed " \
+                           "to scrape data while market is open.", \
+                           self.scraped_date
 
-        # Now go ahead for first webpage Tab of data, "News & Data"
-        # Web page automatically loads this page on opening page
-        # All needed content is under the only "radio-tabs-content" tag,
-        # in separate data-pair-list tag sections, of which there are multiple.
-        # Here we only want to search the first two data-pair-lists' contents for scraping.
-        radio_tabs_content_tag = driver.find_element(By.CLASS_NAME, "radio-tabs-content")
-        data_pair_list_tags = radio_tabs_content_tag.find_elements(By.CLASS_NAME, "data-pair-list")
+            # Now go ahead for first webpage Tab of data, "News & Data"
+            # Web page automatically loads this page on opening page
+            # All needed content is under the only "radio-tabs-content" tag,
+            # in separate data-pair-list tag sections, of which there are multiple.
+            # Here we only want to search the first two data-pair-lists' contents for scraping.
+            radio_tabs_content_tag = driver.find_element(By.CLASS_NAME, "radio-tabs-content")
+            data_pair_list_tags = radio_tabs_content_tag.find_elements(By.CLASS_NAME, "data-pair-list")
 
-        # Call nested function to collect the data keys and values into a list of dictionaries,
-        # one per block of data
-        list_data_dicts = collect_data_pair_tags(data_pair_list_tags)
+            # Call nested function to collect the data keys and values into a list of dictionaries,
+            # one per block of data
+            list_data_dicts = collect_data_pair_tags(data_pair_list_tags)
 
-        # Now store the two dicts separately **in Instance Data** and pause
-        self.news_data_KeyData = list_data_dicts[0]
-        self.news_data_Performance = list_data_dicts[1]
-        time.sleep(4)
+            # Now store the two dicts separately **in Instance Data** and pause
+            self.news_data_KeyData = list_data_dicts[0]
+            self.news_data_Performance = list_data_dicts[1]
+            time.sleep(4)
 
-        # Now switch to the Tab, "Share Details", by clicking on the Tab, rather than reloading the page
-        # First have to scroll down to be able to reliably click the Tab, however
-        driver.execute_script("window.scrollTo(0,500)")
-        share_details_tab = driver.find_element(By.ID, "tab-share-details").find_element(By.TAG_NAME, "input")
-        ActionChains(driver).move_to_element(share_details_tab).click().perform()
+            # Now switch to the Tab, "Share Details", by clicking on the Tab, rather than reloading the page
+            # First have to scroll down to be able to reliably click the Tab, however
+            driver.execute_script("window.scrollTo(0,500)")
+            share_details_tab = driver.find_element(By.ID, "tab-share-details").find_element(By.TAG_NAME, "input")
+            ActionChains(driver).move_to_element(share_details_tab).click().perform()
 
-        # Pause then locate the parent tags on this Tab of data
-        # Note: this reuses the same tag storage items as before.
-        time.sleep(4)
-        radio_tabs_content_tag = driver.find_element(By.CLASS_NAME, "radio-tabs-content")
-        data_pair_list_tags = radio_tabs_content_tag.find_elements(By.CLASS_NAME, "data-pair-list")
+            # Pause then locate the parent tags on this Tab of data
+            # Note: this reuses the same tag storage items as before.
+            time.sleep(4)
+            radio_tabs_content_tag = driver.find_element(By.CLASS_NAME, "radio-tabs-content")
+            data_pair_list_tags = radio_tabs_content_tag.find_elements(By.CLASS_NAME, "data-pair-list")
 
-        # Call nested function again to collect the data keys and values on this Tab,
-        # into a list of dictionaries, one per block of data
-        list_data_dicts = collect_data_pair_tags(data_pair_list_tags)
+            # Call nested function again to collect the data keys and values on this Tab,
+            # into a list of dictionaries, one per block of data
+            list_data_dicts = collect_data_pair_tags(data_pair_list_tags)
 
-        # Now store the two dicts separately **in Instance Data**
-        self.share_det_KeyData = list_data_dicts[0]
-        self.share_det_Profile = list_data_dicts[1]
+            # Now store the two dicts separately **in Instance Data**
+            self.share_det_KeyData = list_data_dicts[0]
+            self.share_det_Profile = list_data_dicts[1]
 
-
-        ######  TEMP ONLY
-        #print(self.news_data_KeyData)
-        #print(self.news_data_Performance)
-        #print(self.share_det_KeyData)
-        #print(self.share_det_Profile)
-
-
-        result = 0   ###### temp only !
-        return result, self.scraped_date
+            result = 0  # successful
+            return result, self.scraped_date
+        except Exception:
+            return "Problem parsing stock page tags for stock: {}".format(self.name),\
+                   ""    # empty string for scraped_date
 
     def get_data(self):
         """
@@ -147,8 +145,8 @@ class Stock:
         Method should be internal to package (protected)
         :return: List[Map] returns a list of the 4 data dictionaries prefaced by the date and name
         """
-        result_list = [self.name,
-                       self.scraped_date,
+        result_list = [self.scraped_date,
+                       self.name,
                        self.news_data_KeyData,
                        self.news_data_Performance,
                        self.share_det_KeyData,
