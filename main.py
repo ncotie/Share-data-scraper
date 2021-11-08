@@ -60,13 +60,14 @@ if __name__ == "__main__":
         print("Storage of scraped data into CSV format completed.")
     else:
         print(result)
-        print("Attempting storage to JSON file.")
 
+    # Note: JSON work incomplete for lack of time
+    #     print("Attempting storage to JSON file.")
 
-    #JSON_object_ref = JSON(path, filename)
-    #result = JSON_object_ref.update_json_file()
-    #if result == 0:
+    # JSON_object_ref = JSON(path, filename)
+    # result = JSON_object_ref.update_json_file()
+    # if result == 0:
     #    print("Storage of scraped data into JSON format completed.")
-    #else:
+    # else:
     #    print(result)
     #    sys.exit("Program terminating.")
