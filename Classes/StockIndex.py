@@ -60,7 +60,7 @@ class StockIndex:
             # Use provided selenium webdriver to read the index components list
             try:
                 driver.get(index_url)
-            except Exception as e:
+            except Exception:
                 return "Problem opening Web site"
 
             # Enclose all tag searching inside try / except to catch any Exceptions
@@ -84,7 +84,7 @@ class StockIndex:
                 component_dict = {component_list_tags[x].text: component_list_tags[x].get_attribute('href')
                                   for x in range(len(component_list_tags))}
             except Exception:
-                return "Problem parsing Index Component tags"
+                return "Problem parsing Index Component tags."
             print("The {} index has {} components.".format(self.index_name, len(component_dict)))
             # should be 20 for SMI
 
@@ -122,15 +122,15 @@ class StockIndex:
                 stock = Stock(component, url)
                 self.component_stock_objects[component] = stock
                 stock_scrape_result, scraped_date = stock.scrape_data(driver, open_market_ok)
+                if stock_scrape_result != 0:  # if result is not ok, break the loop with return
+                    return stock_scrape_result, scraped_date, component
+                # Note that if an error is encountered, we will never build out the complete set of Stock objects.
+
                 # print to say which stock has been scraped, and count of total
                 print("Data scraped for {}, for date {}, {}/{}".format(component,
                                                                        scraped_date,
                                                                        len(self.component_stock_objects),
                                                                        len(self.component_stocks)))
-
-                if stock_scrape_result != 0:   # if result is not ok, break the loop with return
-                    return stock_scrape_result, scraped_date, component
-                # Note that if an error is encountered, we will never build out the complete set of Stock objects.
 
             return 0, scraped_date, "All"  # if successful
         finally:
