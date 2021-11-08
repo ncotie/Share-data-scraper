@@ -9,7 +9,7 @@ Cuando se ejecuta por un índice en concreto, el código busca las acciones compon
 
 Este pensado ser utilizado de forma diaria, programado a ejecutar regularmente de forma automática, así coleccionando datos a lo largo del tiempo.  Esos datos podrían ser útiles para hacer análisis de series temporales, y/o monitorizar cambios temporales en los índices y sus componentes, tras una colección adecuada de datos.
 
-Los datos recogidos se guardan en formato CSV, con una primera línea cabecera con nombres de columnas, y en formato JSON. 
+Los datos recogidos se guardan en formato CSV, con una primera línea cabecera con nombres de columnas. 
 
 El código ha sido escrito siguiendo los principios de programación orientada a objetos, en Python.
 ## Ficheros del código
