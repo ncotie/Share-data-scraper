@@ -25,7 +25,9 @@ if __name__ == "__main__":
         print("Program can only accept one Index name per run, followed by Boolean value, \n"
               "to specify whether market data may be scraped during market open hours, or not.")
         sys.exit("Program terminating.")
-    [index, open_market_ok] = sys.argv[1:]
+    [index, open_market_ok_string] = sys.argv[1:]
+    # Need to convert True / False string to a boolean
+    open_market_ok = open_market_ok_string == "True"
     if index not in valid_indices:
         print("Index {} is either not a valid index name, or cannot be scraped by this program.\n"
               "Program can work with the following indices:\n"
@@ -45,7 +47,8 @@ if __name__ == "__main__":
         print("Scraping completed successfully, data collected for date {}.".format(scraped_date))
     else:
         # if not successful, print textual message of what happened, during which stock, if applicable
-        print("Scraping not completed, {} occurred during scraping for {}.".format(result, return_stock))
+        print("Scraping not completed, the following problem occurred during scraping for {}:"
+              "\n{}".format(return_stock, result, ))
         sys.exit("Program terminating.")
 
     # Store data via CSV and JSON objects

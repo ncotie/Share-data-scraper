@@ -72,7 +72,7 @@ class Stock:
             # Confirm title includes stock name
             assert self.name in driver.title
         except Exception:
-            return "Error opening stock webpage or invalid URL",\
+            return "Error opening stock webpage or invalid URL.",\
                    ""   # An empty value for scraped_date field
 
         # Driver was already on market web page, so no cookies need to be accepted at this point.
@@ -87,12 +87,11 @@ class Stock:
             # and truncated to remove the time, in the case of the market being open still.
             # Dates could be later managed via data pre-processing if necessary.
             self.scraped_date = date_string_full[:10]    # truncate any time value
-
             if len(date_string_full) > 10:    # If time was also displayed
                 # in the case of the SIX pages, time displayed means the market is still open,
                 # and data are not finalized for the day.
                 if not open_market_ok:
-                    return "Market is open while user specified not allowed " \
+                    return "Market is open. User specified that it is not allowed " \
                            "to scrape data while market is open.", \
                            self.scraped_date
 
@@ -136,7 +135,7 @@ class Stock:
             result = 0  # successful
             return result, self.scraped_date
         except Exception:
-            return "Problem parsing stock page tags for stock: {}".format(self.name),\
+            return "Problem parsing stock's webpage tags.",\
                    ""    # empty string for scraped_date
 
     def get_data(self):
